@@ -11,3 +11,61 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* App.css */
+
+body {
+  background-color: #f5f4ff;
+}
+
+/* Secciones con fondo degradado suave */
+.section-gradient {
+  background: linear-gradient(180deg, #f7f6ff, #ffffff);
+}
+
+/* Hero grande */
+.hero-eventia {
+  background: linear-gradient(rgba(59,30,90,0.75), rgba(92,42,157,0.75)),
+    url("https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?auto=format&fit=crop&w=1600&q=80")
+      center/cover no-repeat;
+}
+
+/* Tarjetas elevadas */
+.card-elevated {
+  border-radius: 1.25rem;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+  border: none;
+}
+
+/* Tablas modernas */
+.table-modern thead {
+  background: linear-gradient(90deg, #3b1e5a, #5c2a9d);
+  color: #fff;
+}
+
+.table-modern tbody tr:hover {
+  background-color: #f1edff;
+}
+
+/* Títulos de página */
+.page-title {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+/* Badges suaves opcionales */
+.badge-soft {
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* Botón principal consistente */
+.btn-eventia-primary {
+  background: linear-gradient(90deg, #3b1e5a, #5c2a9d);
+  border: none;
+}
+
+.btn-eventia-primary:hover {
+  filter: brightness(1.05);
+}
