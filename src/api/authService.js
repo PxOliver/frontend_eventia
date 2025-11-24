@@ -1,19 +1,16 @@
-// src/api/authService.js
 import axios from "axios";
 import { API_BASE_URL } from "./config";
 
-const API_URL = API_BASE_URL;
-
 export const register = async (data) => {
-  return await axios.post(`${API_URL}/auth/register`, data);
+  return axios.post(`${API_BASE_URL}/auth/register`, data);
 };
 
 export const login = async (email, password) => {
-  const res = await axios.post(`${API_URL}/auth/login`, {
+  return axios.post(`${API_BASE_URL}/auth/login`, {
     email,
     password,
   });
-
+  
   if (!res.data?.token) {
     throw new Error("Token no recibido desde el backend");
   }
