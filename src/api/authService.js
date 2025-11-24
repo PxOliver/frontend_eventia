@@ -1,20 +1,28 @@
 import axios from "axios";
 import { API_BASE_URL } from "./config";
 
+// =========================
+//  REGISTRO
+// =========================
 export const register = async (data) => {
   return axios.post(`${API_BASE_URL}/auth/register`, data);
 };
 
+// =========================
+//  LOGIN
+// =========================
 export const login = async (email, password) => {
-  return axios.post(`${API_BASE_URL}/auth/login`, {
+  const res = await axios.post(`${API_BASE_URL}/auth/login`, {
     email,
     password,
   });
-  
+
+  // Validación de seguridad
   if (!res.data?.token) {
     throw new Error("Token no recibido desde el backend");
   }
 
+  // Guardar token y datos del usuario
   localStorage.setItem("token", res.data.token);
   localStorage.setItem("rol", res.data.rol || "");
   localStorage.setItem("nombre", res.data.nombre || "");
@@ -23,6 +31,9 @@ export const login = async (email, password) => {
   return res.data;
 };
 
+// =========================
+//  HEADER DE AUTORIZACIÓN
+// =========================
 export const getAuthHeader = () => {
   const token = localStorage.getItem("token");
 
@@ -33,6 +44,9 @@ export const getAuthHeader = () => {
   return { Authorization: `Bearer ${token}` };
 };
 
+// =========================
+//  LOGOUT
+// =========================
 export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("rol");
@@ -40,6 +54,9 @@ export const logout = () => {
   localStorage.removeItem("usuario_id");
 };
 
+// =========================
+//  ESTADO DE LOGIN
+// =========================
 export const isLoggedIn = () => {
   const token = localStorage.getItem("token");
 
