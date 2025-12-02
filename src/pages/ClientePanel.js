@@ -42,7 +42,7 @@ function ClientePanel() {
   const [pagoResumen, setPagoResumen] = useState(null);
   const [procesandoPago, setProcesandoPago] = useState(false);
 
-  // Campos sólo visuales para tarjeta
+  // Campos sólo visuales para tarjeta (no se envían al backend)
   const [cardNumero, setCardNumero] = useState("");
   const [cardNombre, setCardNombre] = useState("");
   const [cardExp, setCardExp] = useState("");
@@ -153,17 +153,13 @@ function ClientePanel() {
 
     setProcesandoPago(true);
 
-    // 👇 Mapeo: YAPE -> TRANSFERENCIA para que el backend lo acepte
-    const metodoParaBackend =
-      pagoMetodo === "YAPE" ? "TRANSFERENCIA" : pagoMetodo;
-
     try {
       await axios.post(
         `${API_URL}/pagos`,
         {
           monto: Number(pagoMonto),
           fecha: pagoFecha,
-          metodo: metodoParaBackend, // EFECTIVO / TARJETA / TRANSFERENCIA
+          metodo: pagoMetodo, // EFECTIVO / TARJETA / YAPE (igual que el enum)
           reserva: { id: reservaParaPagar.id },
         },
         { headers: getAuthHeader() }
@@ -489,9 +485,8 @@ function ClientePanel() {
                         pagar en efectivo.
                       </li>
                       <li>
-                        Toda la coordinación como lugar, fecha y hora para
-                        entregar el dinero será previa coordinación con el
-                        propietario.
+                        Toda la coordinación como lugar, fecha y hora
+                        para entregar el dinero será previa coordinación con el propietario.
                       </li>
                       <li>
                         Una vez realizado el pago, el propietario entregará el
