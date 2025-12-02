@@ -26,8 +26,17 @@ function Perfil() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // --- Estados para cambiar contraseña ---
+  const [passActual, setPassActual] = useState("");
+  const [passNueva, setPassNueva] = useState("");
+  const [passRepetir, setPassRepetir] = useState("");
+  const [mensajePass, setMensajePass] = useState("");
+  const [errorPass, setErrorPass] = useState("");
+  const [loadingPass, setLoadingPass] = useState(false);
+
   const API_PERFIL = `${API_BASE_URL}/perfil`;
   const API_AVATAR = `${API_BASE_URL}/perfil/avatar`;
+  const API_PASSWORD = `${API_BASE_URL}/perfil/password`;
 
   useEffect(() => {
     const cargarPerfil = async () => {
@@ -41,7 +50,6 @@ function Perfil() {
         setFotoPerfil(res.data.fotoPerfil || "");
         setPreview(res.data.fotoPerfil || "");
       } catch (err) {
-        console.error("Error al cargar perfil:", err);
         setError("❌ No se pudo cargar tu perfil.");
       } finally {
         setLoading(false);
@@ -71,7 +79,6 @@ function Perfil() {
     try {
       let fotoUrl = fotoPerfil;
 
-      // Si hay archivo nuevo, primero subirlo
       if (imagenFile) {
         const formData = new FormData();
         formData.append("file", imagenFile);
@@ -89,7 +96,6 @@ function Perfil() {
         }
       }
 
-      // Luego actualizar datos de perfil
       const resUpdate = await axios.put(
         API_PERFIL,
         {
@@ -105,10 +111,45 @@ function Perfil() {
       setPerfil(resUpdate.data);
       setMensaje("✅ Perfil actualizado correctamente.");
     } catch (err) {
-      console.error("Error al actualizar perfil:", err);
       setError("❌ No se pudo actualizar el perfil.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const cambiarPassword = async (e) => {
+    e.preventDefault();
+    setMensajePass("");
+    setErrorPass("");
+
+    if (passNueva !== passRepetir) {
+      setErrorPass("❌ Las nuevas contraseñas no coinciden.");
+      return;
+    }
+
+    setLoadingPass(true);
+
+    try {
+      const res = await axios.put(
+        API_PASSWORD,
+        { actual: passActual, nueva: passNueva },
+        { headers: getAuthHeader() }
+      );
+
+      if (res.data === "CONTRASENA_CAMBIADA") {
+        setMensajePass("✅ Contraseña cambiada correctamente.");
+        setPassActual("");
+        setPassNueva("");
+        setPassRepetir("");
+      }
+    } catch (err) {
+      if (err.response?.data === "CONTRASENA_INCORRECTA") {
+        setErrorPass("❌ Tu contraseña actual es incorrecta.");
+      } else {
+        setErrorPass("❌ No se pudo cambiar la contraseña.");
+      }
+    } finally {
+      setLoadingPass(false);
     }
   };
 
@@ -133,32 +174,9 @@ function Perfil() {
             className="card-elevated p-4 border-0"
             style={{ maxWidth: "480px", width: "100%" }}
           >
-            <h3 className="text-center mb-3 page-title text-primary">
-              Mi Perfil
-            </h3>
-            <p className="text-center text-muted mb-4">
-              Actualiza tu información personal y tu foto de perfil.
-            </p>
+            <h3 className="text-center mb-3 text-primary">Mi Perfil</h3>
 
-            {mensaje && (
-              <Alert
-                variant="success"
-                onClose={() => setMensaje("")}
-                dismissible
-              >
-                {mensaje}
-              </Alert>
-            )}
-            {error && (
-              <Alert
-                variant="danger"
-                onClose={() => setError("")}
-                dismissible
-              >
-                {error}
-              </Alert>
-            )}
-
+            {/* FOTO */}
             <div className="text-center mb-3">
               <div
                 style={{
@@ -173,7 +191,7 @@ function Perfil() {
                 <img
                   src={
                     preview ||
-                    "https://media.istockphoto.com/id/2171382633/es/vector/icono-de-perfil-de-usuario-s%C3%ADmbolo-de-persona-an%C3%B3nima-gr%C3%A1fico-de-avatar-en-blanco.jpg?s=170667a&w=0&k=20&c=EYDmvszA_OROrG3hRVHuyeWhF3I0W2PORG5qis-kewQ="
+                    "https://cdn-icons-png.flaticon.com/512/149/149071.png"
                   }
                   alt="Foto de perfil"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -185,7 +203,9 @@ function Perfil() {
               </Form.Group>
             </div>
 
+            {/* FORM PERFIL */}
             <Form onSubmit={handleSubmit}>
+
               <Form.Group className="mb-3">
                 <Form.Label>Nombre</Form.Label>
                 <Form.Control
@@ -208,27 +228,76 @@ function Perfil() {
 
               <Form.Group className="mb-4">
                 <Form.Label>Correo</Form.Label>
+                <Form.Control type="email" value={perfil?.email || ""} disabled />
+              </Form.Group>
+
+              {mensaje && <Alert variant="success">{mensaje}</Alert>}
+              {error && <Alert variant="danger">{error}</Alert>}
+
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-100 fw-bold"
+                disabled={saving}
+              >
+                {saving ? "Guardando..." : "Guardar cambios"}
+              </Button>
+            </Form>
+
+            {/* CAMBIAR CONTRASEÑA */}
+            <hr className="my-4" />
+
+            <h4 className="text-center text-primary fw-bold">
+              Cambiar Contraseña
+            </h4>
+
+            {mensajePass && <Alert variant="success">{mensajePass}</Alert>}
+            {errorPass && <Alert variant="danger">{errorPass}</Alert>}
+
+            <Form onSubmit={cambiarPassword}>
+              <Form.Group className="mb-3">
+                <Form.Label>Contraseña actual</Form.Label>
                 <Form.Control
-                  type="email"
-                  value={perfil?.email || ""}
-                  disabled
+                  type="password"
+                  value={passActual}
+                  onChange={(e) => setPassActual(e.target.value)}
+                  required
                 />
               </Form.Group>
 
-              <div className="d-grid">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="fw-semibold"
-                  disabled={saving}
-                >
-                  {saving ? "Guardando..." : "Guardar cambios"}
-                </Button>
-              </div>
+              <Form.Group className="mb-3">
+                <Form.Label>Nueva contraseña</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={passNueva}
+                  onChange={(e) => setPassNueva(e.target.value)}
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-4">
+                <Form.Label>Repetir nueva contraseña</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={passRepetir}
+                  onChange={(e) => setPassRepetir(e.target.value)}
+                  required
+                />
+              </Form.Group>
+
+              <Button
+                type="submit"
+                variant="warning"
+                className="w-100 fw-bold"
+                disabled={loadingPass}
+              >
+                {loadingPass ? "Actualizando..." : "Cambiar contraseña"}
+              </Button>
             </Form>
           </Card>
         </Container>
       </div>
+
       <FooterEventia />
     </div>
   );
