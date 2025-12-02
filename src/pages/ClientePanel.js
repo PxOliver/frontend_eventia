@@ -7,8 +7,17 @@ import {
   Modal,
   Form,
   Alert,
+  Row,
+  Col,
 } from "react-bootstrap";
-import { FaCommentDots, FaMoneyBillWave, FaTimes } from "react-icons/fa";
+import {
+  FaCommentDots,
+  FaMoneyBillWave,
+  FaTimes,
+  FaCreditCard,
+  FaUniversity,
+  FaWallet,
+} from "react-icons/fa";
 import NavbarEventia from "../components/NavbarEventia";
 import FooterEventia from "../components/FooterEventia";
 import axios from "axios";
@@ -31,6 +40,13 @@ function ClientePanel() {
   const [pagoMetodo, setPagoMetodo] = useState("EFECTIVO");
   const [reservaParaPagar, setReservaParaPagar] = useState(null);
   const [pagoResumen, setPagoResumen] = useState(null);
+  const [procesandoPago, setProcesandoPago] = useState(false);
+
+  // Campos “visuales” para tarjeta (no se envían al backend)
+  const [cardNumero, setCardNumero] = useState("");
+  const [cardNombre, setCardNombre] = useState("");
+  const [cardExp, setCardExp] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
 
   const API_URL = API_BASE_URL;
 
@@ -122,6 +138,12 @@ function ClientePanel() {
       total: total.toFixed(2),
     });
 
+    // Reseteamos campos de tarjeta
+    setCardNumero("");
+    setCardNombre("");
+    setCardExp("");
+    setCardCvv("");
+
     setShowPagoModal(true);
   };
 
@@ -129,13 +151,15 @@ function ClientePanel() {
     e.preventDefault();
     if (!reservaParaPagar) return;
 
+    setProcesandoPago(true);
+
     try {
       await axios.post(
         `${API_URL}/pagos`,
         {
           monto: Number(pagoMonto),
           fecha: pagoFecha,
-          metodo: pagoMetodo,
+          metodo: pagoMetodo, // EFECTIVO / TARJETA / TRANSFERENCIA
           reserva: { id: reservaParaPagar.id },
         },
         { headers: getAuthHeader() }
@@ -148,6 +172,8 @@ function ClientePanel() {
     } catch (error) {
       console.error("Error al registrar pago:", error);
       setMensaje("❌ No se pudo registrar el pago.");
+    } finally {
+      setProcesandoPago(false);
     }
   };
 
@@ -176,6 +202,8 @@ function ClientePanel() {
     }
   };
 
+  const isMetodoTarjeta = pagoMetodo === "TARJETA";
+
   return (
     <div className="d-flex flex-column min-vh-100">
       <NavbarEventia />
@@ -185,7 +213,8 @@ function ClientePanel() {
           <div className="mb-4">
             <h2 className="page-title text-primary mb-1">Panel del Cliente</h2>
             <p className="text-muted mb-0">
-              Revisa el estado de tus reservas y gestiona tus pagos.
+              Revisa el estado de tus reservas y gestiona tus pagos de manera
+              segura.
             </p>
           </div>
 
@@ -247,7 +276,7 @@ function ClientePanel() {
                             onClick={() => handlePagar(r)}
                           >
                             <FaMoneyBillWave className="me-1" />
-                            Registrar pago
+                            Pagar reserva
                           </Button>
                         </>
                       )}
@@ -314,78 +343,185 @@ function ClientePanel() {
         show={showPagoModal}
         onHide={() => setShowPagoModal(false)}
         centered
+        size="lg"
       >
         <Modal.Header closeButton className="bg-success text-white">
           <Modal.Title>Registrar pago</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
-          {pagoResumen && (
-            <div className="mb-3 p-3 bg-light rounded-3">
-              <p className="mb-1">
-                <strong>Propiedad:</strong> {pagoResumen.propiedad}
-              </p>
-              <p className="mb-1">
-                <strong>Fechas:</strong> {pagoResumen.fechaInicio} al{" "}
-                {pagoResumen.fechaFin}
-              </p>
-              <p className="mb-1">
-                <strong>Precio por día:</strong> S/{" "}
-                {pagoResumen.precioDia?.toFixed(2)}
-              </p>
-              <p className="mb-1">
-                <strong>Días reservados:</strong> {pagoResumen.dias}
-              </p>
-              <p className="mb-0">
-                <strong>Total calculado:</strong> S/ {pagoResumen.total}
-              </p>
-            </div>
-          )}
+          <Row>
+            {/* Resumen de la reserva */}
+            <Col md={5} className="mb-3 mb-md-0">
+              {pagoResumen && (
+                <div
+                  className="p-3 h-100 rounded-3"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #5C2A9D, #8C52FF, #FFD54F)",
+                    color: "white",
+                  }}
+                >
+                  <h5 className="fw-bold mb-2">Resumen de la reserva</h5>
+                  <p className="mb-1">
+                    <strong>Propiedad:</strong> {pagoResumen.propiedad}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Fechas:</strong> {pagoResumen.fechaInicio} al{" "}
+                    {pagoResumen.fechaFin}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Precio por día:</strong> S/{" "}
+                    {pagoResumen.precioDia?.toFixed(2)}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Días reservados:</strong> {pagoResumen.dias}
+                  </p>
+                  <hr className="border-light" />
+                  <h4 className="fw-bold mb-0">
+                    Total a pagar:{" "}
+                    <span className="text-warning">
+                      S/ {pagoResumen.total}
+                    </span>
+                  </h4>
+                </div>
+              )}
+            </Col>
 
-          <Form onSubmit={handleEnviarPago}>
-            <Form.Group className="mb-3">
-              <Form.Label>Monto total (S/)</Form.Label>
-              <Form.Control
-                type="number"
-                value={pagoMonto}
-                onChange={(e) => setPagoMonto(e.target.value)}
-                min="0"
-                step="0.01"
-                required
-              />
-              <Form.Text className="text-muted">
-                Puedes ajustar el monto si es necesario.
-              </Form.Text>
-            </Form.Group>
+            {/* Formulario de pago */}
+            <Col md={7}>
+              <Form onSubmit={handleEnviarPago}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Monto total (S/)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={pagoMonto}
+                    onChange={(e) => setPagoMonto(e.target.value)}
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                  <Form.Text className="text-muted">
+                    Puedes ajustar el monto si es necesario.
+                  </Form.Text>
+                </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Fecha de pago</Form.Label>
-              <Form.Control
-                type="date"
-                value={pagoFecha}
-                onChange={(e) => setPagoFecha(e.target.value)}
-                required
-              />
-            </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Fecha de pago</Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={pagoFecha}
+                    onChange={(e) => setPagoFecha(e.target.value)}
+                    required
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Método</Form.Label>
-              <Form.Select
-                value={pagoMetodo}
-                onChange={(e) => setPagoMetodo(e.target.value)}
-              >
-                <option value="EFECTIVO">Efectivo</option>
-                <option value="TARJETA">Tarjeta</option>
-                <option value="TRANSFERENCIA">Transferencia</option>
-              </Form.Select>
-            </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Método de pago</Form.Label>
+                  <div className="d-flex flex-wrap gap-2">
+                    <Form.Check
+                      type="radio"
+                      id="metodo-efectivo"
+                      name="metodo"
+                      label={
+                        <>
+                          <FaWallet className="me-1" /> Efectivo
+                        </>
+                      }
+                      checked={pagoMetodo === "EFECTIVO"}
+                      onChange={() => setPagoMetodo("EFECTIVO")}
+                    />
+                    <Form.Check
+                      type="radio"
+                      id="metodo-tarjeta"
+                      name="metodo"
+                      label={
+                        <>
+                          <FaCreditCard className="me-1" /> Tarjeta
+                        </>
+                      }
+                      checked={pagoMetodo === "TARJETA"}
+                      onChange={() => setPagoMetodo("TARJETA")}
+                    />
+                    <Form.Check
+                      type="radio"
+                      id="metodo-transferencia"
+                      name="metodo"
+                      label={
+                        <>
+                          <FaUniversity className="me-1" /> Transferencia
+                        </>
+                      }
+                      checked={pagoMetodo === "TRANSFERENCIA"}
+                      onChange={() => setPagoMetodo("TRANSFERENCIA")}
+                    />
+                  </div>
+                  <Form.Text className="text-muted">
+                    * Esta simulación de pago es solo visual, no procesa
+                    cobros reales.
+                  </Form.Text>
+                </Form.Group>
 
-            <div className="d-grid">
-              <Button variant="success" type="submit" className="fw-semibold">
-                Guardar pago
-              </Button>
-            </div>
-          </Form>
+                {isMetodoTarjeta && (
+                  <div className="mb-3 p-3 border rounded-3 bg-light">
+                    <p className="mb-2 fw-semibold">Datos de tarjeta</p>
+                    <Form.Group className="mb-2">
+                      <Form.Label>Número de tarjeta</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardNumero}
+                        onChange={(e) => setCardNumero(e.target.value)}
+                        maxLength={19}
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                      <Form.Label>Nombre en la tarjeta</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Nombre Apellido"
+                        value={cardNombre}
+                        onChange={(e) => setCardNombre(e.target.value)}
+                      />
+                    </Form.Group>
+                    <div className="d-flex gap-2">
+                      <Form.Group className="mb-2 flex-fill">
+                        <Form.Label>Vencimiento</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="MM/AA"
+                          value={cardExp}
+                          onChange={(e) => setCardExp(e.target.value)}
+                          maxLength={5}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-2" style={{ width: "120px" }}>
+                        <Form.Label>CVV</Form.Label>
+                        <Form.Control
+                          type="password"
+                          placeholder="***"
+                          value={cardCvv}
+                          onChange={(e) => setCardCvv(e.target.value)}
+                          maxLength={4}
+                        />
+                      </Form.Group>
+                    </div>
+                  </div>
+                )}
+
+                <div className="d-grid">
+                  <Button
+                    variant="success"
+                    type="submit"
+                    className="fw-semibold"
+                    disabled={procesandoPago}
+                  >
+                    {procesandoPago ? "Procesando pago..." : "Guardar pago"}
+                  </Button>
+                </div>
+              </Form>
+            </Col>
+          </Row>
         </Modal.Body>
       </Modal>
     </div>
