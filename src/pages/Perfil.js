@@ -173,7 +173,7 @@ function Perfil() {
                 <img
                   src={
                     preview ||
-                    "https://via.placeholder.com/150x150.png?text=Sin+Foto"
+                    "https://media.istockphoto.com/id/2171382633/es/vector/icono-de-perfil-de-usuario-s%C3%ADmbolo-de-persona-an%C3%B3nima-gr%C3%A1fico-de-avatar-en-blanco.jpg?s=170667a&w=0&k=20&c=EYDmvszA_OROrG3hRVHuyeWhF3I0W2PORG5qis-kewQ="
                   }
                   alt="Foto de perfil"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}

@@ -133,7 +133,7 @@ function NavbarEventia() {
                     />
                   ) : (
                     <Image
-                      src="https://via.placeholder.com/32x32?text=?"
+                      src="https://media.istockphoto.com/id/2171382633/es/vector/icono-de-perfil-de-usuario-s%C3%ADmbolo-de-persona-an%C3%B3nima-gr%C3%A1fico-de-avatar-en-blanco.jpg?s=170667a&w=0&k=20&c=EYDmvszA_OROrG3hRVHuyeWhF3I0W2PORG5qis-kewQ="
                       roundedCircle
                       width="32"
                       height="32"
