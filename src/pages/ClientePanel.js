@@ -485,12 +485,12 @@ function ClientePanel() {
                         pagar en efectivo.
                       </li>
                       <li>
-                        A través del sistema se coordinarán lugar, fecha y hora
-                        para entregar el dinero.
+                        Toda la coordinación como lugar, fecha y hora
+                        para entregar el dinero será previa coordinación con el propietario.
                       </li>
                       <li>
-                        Una vez realizado el pago, el propietario confirmará la
-                        operación en la plataforma.
+                        Una vez realizado el pago, el propietario entregará el acceso al
+                        espacio o propiedad.
                       </li>
                     </ul>
                   </div>
@@ -551,7 +551,7 @@ function ClientePanel() {
                       Paga con Yape escaneando este código
                     </p>
                     <img
-                      src="https://via.placeholder.com/160x160.png?text=QR+Yape"
+                      src="https://pepestubroaster.com/wp-content/uploads/QR-Yape-Pepes-Tu-Broaster.jpg"
                       alt="Código QR Yape"
                       style={{
                         width: "160px",
