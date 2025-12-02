@@ -138,7 +138,7 @@ function ClientePanel() {
       total: total.toFixed(2),
     });
 
-    // reset simulaciones
+    // reset simulaciones tarjeta
     setCardNumero("");
     setCardNombre("");
     setCardExp("");
@@ -485,12 +485,12 @@ function ClientePanel() {
                         pagar en efectivo.
                       </li>
                       <li>
-                        Toda la coordinación como lugar, fecha y hora
-                        para entregar el dinero será previa coordinación con el propietario.
+                        Toda la coordinación (lugar, fecha y hora) para entregar
+                        el dinero será acordada directamente con el propietario.
                       </li>
                       <li>
-                        Una vez realizado el pago, el propietario entregará el
-                        acceso al espacio o propiedad.
+                        Una vez realizado el pago, el propietario confirmará en
+                        la plataforma y tendrás acceso al espacio o propiedad.
                       </li>
                     </ul>
                   </div>
