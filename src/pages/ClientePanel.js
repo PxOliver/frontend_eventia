@@ -15,7 +15,7 @@ import {
   FaMoneyBillWave,
   FaTimes,
   FaCreditCard,
-  FaUniversity,
+  FaMobileAlt,
   FaWallet,
 } from "react-icons/fa";
 import NavbarEventia from "../components/NavbarEventia";
@@ -42,7 +42,7 @@ function ClientePanel() {
   const [pagoResumen, setPagoResumen] = useState(null);
   const [procesandoPago, setProcesandoPago] = useState(false);
 
-  // Campos “visuales” para tarjeta (no se envían al backend)
+  // Campos sólo visuales para tarjeta
   const [cardNumero, setCardNumero] = useState("");
   const [cardNombre, setCardNombre] = useState("");
   const [cardExp, setCardExp] = useState("");
@@ -138,7 +138,7 @@ function ClientePanel() {
       total: total.toFixed(2),
     });
 
-    // Reseteamos campos de tarjeta
+    // reset simulaciones
     setCardNumero("");
     setCardNombre("");
     setCardExp("");
@@ -159,13 +159,22 @@ function ClientePanel() {
         {
           monto: Number(pagoMonto),
           fecha: pagoFecha,
-          metodo: pagoMetodo, // EFECTIVO / TARJETA / TRANSFERENCIA
+          metodo: pagoMetodo, // EFECTIVO / TARJETA / YAPE
           reserva: { id: reservaParaPagar.id },
         },
         { headers: getAuthHeader() }
       );
 
-      setMensaje("✅ Pago registrado correctamente.");
+      let msg = "✅ Pago registrado correctamente.";
+      if (pagoMetodo === "EFECTIVO") {
+        msg =
+          "✅ Registro guardado. Coordina el pago en efectivo directamente con el propietario. Recibirás los detalles por el sistema.";
+      } else if (pagoMetodo === "YAPE") {
+        msg =
+          "✅ Pago por Yape registrado. No olvides enviar el voucher al propietario.";
+      }
+
+      setMensaje(msg);
       setShowPagoModal(false);
       setReservaParaPagar(null);
       setPagoResumen(null);
@@ -203,6 +212,8 @@ function ClientePanel() {
   };
 
   const isMetodoTarjeta = pagoMetodo === "TARJETA";
+  const isMetodoYape = pagoMetodo === "YAPE";
+  const isMetodoEfectivo = pagoMetodo === "EFECTIVO";
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -445,23 +456,47 @@ function ClientePanel() {
                     />
                     <Form.Check
                       type="radio"
-                      id="metodo-transferencia"
+                      id="metodo-yape"
                       name="metodo"
                       label={
                         <>
-                          <FaUniversity className="me-1" /> Transferencia
+                          <FaMobileAlt className="me-1" /> Yape
                         </>
                       }
-                      checked={pagoMetodo === "TRANSFERENCIA"}
-                      onChange={() => setPagoMetodo("TRANSFERENCIA")}
+                      checked={pagoMetodo === "YAPE"}
+                      onChange={() => setPagoMetodo("YAPE")}
                     />
                   </div>
                   <Form.Text className="text-muted">
-                    * Esta simulación de pago es solo visual, no procesa
-                    cobros reales.
+                    * Esta simulación es solo visual, no se realizan cobros
+                    reales.
                   </Form.Text>
                 </Form.Group>
 
+                {/* EFECTIVO: simulación de coordinación */}
+                {isMetodoEfectivo && (
+                  <div className="mb-3 p-3 border rounded-3 bg-light text-start">
+                    <p className="fw-semibold mb-2">
+                      Cómo completar tu pago en efectivo
+                    </p>
+                    <ul className="mb-0">
+                      <li>
+                        El propietario recibirá tu intención de pago en
+                        efectivo.
+                      </li>
+                      <li>
+                        Se coordinará por el sistema el lugar y la fecha para
+                        realizar el pago.
+                      </li>
+                      <li>
+                        Una vez entregado el efectivo, el propietario confirmará
+                        el pago en la plataforma.
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
+                {/* TARJETA: simulación */}
                 {isMetodoTarjeta && (
                   <div className="mb-3 p-3 border rounded-3 bg-light">
                     <p className="mb-2 fw-semibold">Datos de tarjeta</p>
@@ -506,6 +541,32 @@ function ClientePanel() {
                         />
                       </Form.Group>
                     </div>
+                  </div>
+                )}
+
+                {/* YAPE: simulación QR y número */}
+                {isMetodoYape && (
+                  <div className="mb-3 p-3 border rounded-3 bg-light text-center">
+                    <p className="fw-semibold mb-2">
+                      Paga con Yape escaneando este código
+                    </p>
+                    <div
+                      style={{
+                        width: "160px",
+                        height: "160px",
+                        margin: "0 auto 10px",
+                        background:
+                          "repeating-linear-gradient(45deg,#ccc,#ccc 5px,#eee 5px,#eee 10px)",
+                        borderRadius: "12px",
+                      }}
+                    />
+                    <p className="mb-1">
+                      <strong>Celular Yape:</strong> 999 999 999
+                    </p>
+                    <p className="text-muted mb-0">
+                      Luego de pagar, sube tu voucher o envíalo al propietario
+                      para que lo confirme.
+                    </p>
                   </div>
                 )}
 
