@@ -7,6 +7,7 @@ import {
   Alert,
   Spinner,
 } from "react-bootstrap";
+import { FaUserCircle, FaCamera, FaLock } from "react-icons/fa";
 import NavbarEventia from "../components/NavbarEventia";
 import FooterEventia from "../components/FooterEventia";
 import axios from "axios";
@@ -158,7 +159,7 @@ function Perfil() {
       <div className="d-flex flex-column min-vh-100">
         <NavbarEventia />
         <Container className="flex-fill d-flex justify-content-center align-items-center">
-          <Spinner animation="border" />
+          <Spinner animation="border" variant="primary" />
         </Container>
         <FooterEventia />
       </div>
@@ -168,132 +169,241 @@ function Perfil() {
   return (
     <div className="d-flex flex-column min-vh-100">
       <NavbarEventia />
+
+      {/* Fondo suave para la sección de perfil */}
       <div className="flex-fill section-gradient py-5">
         <Container className="d-flex justify-content-center">
           <Card
-            className="card-elevated p-4 border-0"
-            style={{ maxWidth: "480px", width: "100%" }}
+            className="card-elevated border-0 shadow-lg"
+            style={{
+              maxWidth: "560px",
+              width: "100%",
+              borderRadius: "18px",
+            }}
           >
-            <h3 className="text-center mb-3 text-primary">Mi Perfil</h3>
-
-            {/* FOTO */}
-            <div className="text-center mb-3">
-              <div
-                style={{
-                  width: "120px",
-                  height: "120px",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  margin: "0 auto 10px",
-                  border: "3px solid #5C2A9D",
-                }}
-              >
-                <img
-                  src={
-                    preview ||
-                    "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                  }
-                  alt="Foto de perfil"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
+            {/* Encabezado */}
+            <div
+              style={{
+                background:
+                  "linear-gradient(135deg, #3B1E5A, #5C2A9D 60%, #FFD700)",
+                borderTopLeftRadius: "18px",
+                borderTopRightRadius: "18px",
+                padding: "18px 24px",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <FaUserCircle size={32} />
+              <div>
+                <h4 className="mb-0 fw-bold">Mi Perfil</h4>
+                <small className="text-light">
+                  Gestiona tu información personal y seguridad
+                </small>
               </div>
-              <Form.Group controlId="formFile" className="mb-3">
-                <Form.Label className="mb-0">Cambiar foto</Form.Label>
-                <Form.Control type="file" accept="image/*" onChange={handleFileChange} />
-              </Form.Group>
             </div>
 
-            {/* FORM PERFIL */}
-            <Form onSubmit={handleSubmit}>
+            <Card.Body className="p-4">
+              {/* FOTO */}
+              <div className="text-center mb-4">
+                <div
+                  style={{
+                    width: "130px",
+                    height: "130px",
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    margin: "0 auto 12px",
+                    border: "3px solid #5C2A9D",
+                    position: "relative",
+                    backgroundColor: "#f8f9fa",
+                  }}
+                >
+                  <img
+                    src={
+                      preview ||
+                      "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                    }
+                    alt="Foto de perfil"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  {/* Botón flotante de cámara */}
+                  <label
+                    htmlFor="avatarInput"
+                    style={{
+                      position: "absolute",
+                      right: 6,
+                      bottom: 6,
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      backgroundColor: "#5C2A9D",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      border: "2px solid white",
+                    }}
+                  >
+                    <FaCamera color="#fff" size={14} />
+                  </label>
+                </div>
+                <Form.Group controlId="avatarInput" className="mb-0">
+                  <Form.Control
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                </Form.Group>
+                <small className="text-muted">
+                  Formato recomendado: JPG o PNG (máx. 2MB).
+                </small>
+              </div>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Nombre</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  required
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Apellido</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={apellido}
-                  onChange={(e) => setApellido(e.target.value)}
-                  required
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-4">
-                <Form.Label>Correo</Form.Label>
-                <Form.Control type="email" value={perfil?.email || ""} disabled />
-              </Form.Group>
-
-              {mensaje && <Alert variant="success">{mensaje}</Alert>}
-              {error && <Alert variant="danger">{error}</Alert>}
-
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-100 fw-bold"
-                disabled={saving}
+              {/* FORM PERFIL */}
+              <div
+                className="p-3 mb-4"
+                style={{
+                  backgroundColor: "#f8f9ff",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(92,42,157,0.08)",
+                }}
               >
-                {saving ? "Guardando..." : "Guardar cambios"}
-              </Button>
-            </Form>
+                <h6 className="text-primary fw-bold mb-3">Datos personales</h6>
 
-            {/* CAMBIAR CONTRASEÑA */}
-            <hr className="my-4" />
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Nombre</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
 
-            <h4 className="text-center text-primary fw-bold">
-              Cambiar Contraseña
-            </h4>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Apellido</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={apellido}
+                      onChange={(e) => setApellido(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
 
-            {mensajePass && <Alert variant="success">{mensajePass}</Alert>}
-            {errorPass && <Alert variant="danger">{errorPass}</Alert>}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Correo</Form.Label>
+                    <Form.Control
+                      type="email"
+                      value={perfil?.email || ""}
+                      disabled
+                    />
+                    <Form.Text className="text-muted">
+                      Tu correo no se puede modificar desde aquí.
+                    </Form.Text>
+                  </Form.Group>
 
-            <Form onSubmit={cambiarPassword}>
-              <Form.Group className="mb-3">
-                <Form.Label>Contraseña actual</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={passActual}
-                  onChange={(e) => setPassActual(e.target.value)}
-                  required
-                />
-              </Form.Group>
+                  {mensaje && (
+                    <Alert variant="success" className="py-2">
+                      {mensaje}
+                    </Alert>
+                  )}
+                  {error && (
+                    <Alert variant="danger" className="py-2">
+                      {error}
+                    </Alert>
+                  )}
 
-              <Form.Group className="mb-3">
-                <Form.Label>Nueva contraseña</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={passNueva}
-                  onChange={(e) => setPassNueva(e.target.value)}
-                  required
-                />
-              </Form.Group>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-100 fw-semibold"
+                    disabled={saving}
+                  >
+                    {saving ? "Guardando cambios..." : "Guardar cambios"}
+                  </Button>
+                </Form>
+              </div>
 
-              <Form.Group className="mb-4">
-                <Form.Label>Repetir nueva contraseña</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={passRepetir}
-                  onChange={(e) => setPassRepetir(e.target.value)}
-                  required
-                />
-              </Form.Group>
-
-              <Button
-                type="submit"
-                variant="warning"
-                className="w-100 fw-bold"
-                disabled={loadingPass}
+              {/* CAMBIAR CONTRASEÑA */}
+              <div
+                className="p-3"
+                style={{
+                  backgroundColor: "#fff9eb",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,193,7,0.3)",
+                }}
               >
-                {loadingPass ? "Actualizando..." : "Cambiar contraseña"}
-              </Button>
-            </Form>
+                <div className="d-flex align-items-center mb-2">
+                  <FaLock className="me-2 text-warning" />
+                  <h6 className="mb-0 text-warning fw-bold">
+                    Cambiar contraseña
+                  </h6>
+                </div>
+                <small className="text-muted d-block mb-3">
+                  Te recomendamos usar una contraseña segura que no utilices en
+                  otros sitios.
+                </small>
+
+                {mensajePass && (
+                  <Alert variant="success" className="py-2">
+                    {mensajePass}
+                  </Alert>
+                )}
+                {errorPass && (
+                  <Alert variant="danger" className="py-2">
+                    {errorPass}
+                  </Alert>
+                )}
+
+                <Form onSubmit={cambiarPassword}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Contraseña actual</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={passActual}
+                      onChange={(e) => setPassActual(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Nueva contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={passNueva}
+                      onChange={(e) => setPassNueva(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Repetir nueva contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={passRepetir}
+                      onChange={(e) => setPassRepetir(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Button
+                    type="submit"
+                    variant="warning"
+                    className="w-100 fw-semibold"
+                    disabled={loadingPass}
+                  >
+                    {loadingPass ? "Actualizando..." : "Cambiar contraseña"}
+                  </Button>
+                </Form>
+              </div>
+            </Card.Body>
           </Card>
         </Container>
       </div>
