@@ -74,7 +74,7 @@ function PropietarioPanel() {
   const confirmarReserva = async (id) => {
     try {
       await axios.put(
-        `http://localhost:8080/api/reservas/${id}/confirmar`,
+        `${API_BASE_URL}/reservas/${id}/confirmar`,
         {},
         { headers: getAuthHeader() }
       );
@@ -92,7 +92,7 @@ function PropietarioPanel() {
 
     try {
       await axios.put(
-        `http://localhost:8080/api/reservas/${id}/rechazar`,
+        `${API_BASE_URL}/reservas/${id}/rechazar`,
         {},
         { headers: getAuthHeader() }
       );
