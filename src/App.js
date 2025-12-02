@@ -11,6 +11,7 @@ import ClientePanel from "./pages/ClientePanel";
 import DetallePropiedad from "./pages/DetallePropiedad";
 import CategoriasPropiedades from "./pages/CategoriasPropiedades";
 import VerificarCuenta from "./pages/VerificarCuenta";
+import Perfil from "./pages/Perfil";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/propiedad/:id" element={<DetallePropiedad />} />
         <Route path="/categorias" element={<CategoriasPropiedades />} />
         <Route path="/verificar" element={<VerificarCuenta />} />
+        <Route path="/perfil" element={<Perfil />} />
       </Routes>
     </Router>
   );
