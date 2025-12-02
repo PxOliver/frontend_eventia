@@ -153,19 +153,23 @@ function ClientePanel() {
 
     setProcesandoPago(true);
 
+    // 👇 Mapeo: YAPE -> TRANSFERENCIA para que el backend lo acepte
+    const metodoParaBackend =
+      pagoMetodo === "YAPE" ? "TRANSFERENCIA" : pagoMetodo;
+
     try {
       await axios.post(
         `${API_URL}/pagos`,
         {
           monto: Number(pagoMonto),
           fecha: pagoFecha,
-          metodo: pagoMetodo, // EFECTIVO / TARJETA / YAPE
+          metodo: metodoParaBackend, // EFECTIVO / TARJETA / TRANSFERENCIA
           reserva: { id: reservaParaPagar.id },
         },
         { headers: getAuthHeader() }
       );
 
-      let msg = "✅ Pago registrado correctamente.";
+      let msg = "✅ Pago registrado correctamente previa coordinación.";
       if (pagoMetodo === "EFECTIVO") {
         msg =
           "✅ Registro guardado. El pago en efectivo se realizará previa coordinación directa con el propietario.";
@@ -485,12 +489,13 @@ function ClientePanel() {
                         pagar en efectivo.
                       </li>
                       <li>
-                        Toda la coordinación como lugar, fecha y hora
-                        para entregar el dinero será previa coordinación con el propietario.
+                        Toda la coordinación como lugar, fecha y hora para
+                        entregar el dinero será previa coordinación con el
+                        propietario.
                       </li>
                       <li>
-                        Una vez realizado el pago, el propietario entregará el acceso al
-                        espacio o propiedad.
+                        Una vez realizado el pago, el propietario entregará el
+                        acceso al espacio o propiedad.
                       </li>
                     </ul>
                   </div>
