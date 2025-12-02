@@ -159,7 +159,7 @@ function ClientePanel() {
         {
           monto: Number(pagoMonto),
           fecha: pagoFecha,
-          metodo: pagoMetodo, // EFECTIVO / TARJETA / YAPE (igual que el enum)
+          metodo: pagoMetodo, // EFECTIVO / TARJETA / YAPE
           reserva: { id: reservaParaPagar.id },
         },
         { headers: getAuthHeader() }
@@ -175,9 +175,20 @@ function ClientePanel() {
       }
 
       setMensaje(msg);
+
+      // 🔹 Marcar en el estado local que esta reserva ya tiene pago
+      setReservas((prev) =>
+        prev.map((r) =>
+          r.id === reservaParaPagar.id ? { ...r, pagado: true } : r
+        )
+      );
+
       setShowPagoModal(false);
       setReservaParaPagar(null);
       setPagoResumen(null);
+
+      // (Opcional) Si tu backend ya devuelve info de pago en reservas, puedes refrescar:
+      // await cargarReservas();
     } catch (error) {
       console.error("Error al registrar pago:", error);
       setMensaje("❌ No se pudo registrar el pago.");
@@ -209,6 +220,12 @@ function ClientePanel() {
           </Badge>
         );
     }
+  };
+
+  // 🔹 Función helper: ver si una reserva ya tiene pago
+  const reservaTienePago = (reserva) => {
+    // Si en el futuro tu backend manda r.pago o r.pagado, esto también lo toma
+    return !!(reserva.pagado || reserva.pago);
   };
 
   const isMetodoTarjeta = pagoMetodo === "TARJETA";
@@ -281,14 +298,23 @@ function ClientePanel() {
                             Comentar
                           </Button>
 
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => handlePagar(r)}
-                          >
-                            <FaMoneyBillWave className="me-1" />
-                            Pagar reserva
-                          </Button>
+                          {/* 🔹 Solo mostrar "Pagar reserva" si aún NO tiene pago */}
+                          {!reservaTienePago(r) && (
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() => handlePagar(r)}
+                            >
+                              <FaMoneyBillWave className="me-1" />
+                              Pagar reserva
+                            </Button>
+                          )}
+
+                          {reservaTienePago(r) && (
+                            <small className="text-success fw-semibold">
+                              Pago registrado
+                            </small>
+                          )}
                         </>
                       )}
 
