@@ -168,10 +168,10 @@ function ClientePanel() {
       let msg = "✅ Pago registrado correctamente.";
       if (pagoMetodo === "EFECTIVO") {
         msg =
-          "✅ Registro guardado. Coordina el pago en efectivo directamente con el propietario. Recibirás los detalles por el sistema.";
+          "✅ Registro guardado. El pago en efectivo se realizará previa coordinación directa con el propietario.";
       } else if (pagoMetodo === "YAPE") {
         msg =
-          "✅ Pago por Yape registrado. No olvides enviar el voucher al propietario.";
+          "✅ Pago por Yape registrado. No olvides enviar el voucher al propietario para que lo confirme.";
       }
 
       setMensaje(msg);
@@ -477,20 +477,20 @@ function ClientePanel() {
                 {isMetodoEfectivo && (
                   <div className="mb-3 p-3 border rounded-3 bg-light text-start">
                     <p className="fw-semibold mb-2">
-                      Cómo completar tu pago en efectivo
+                      Pago en efectivo (previa coordinación)
                     </p>
                     <ul className="mb-0">
                       <li>
-                        El propietario recibirá tu intención de pago en
-                        efectivo.
+                        El propietario recibirá la notificación de que deseas
+                        pagar en efectivo.
                       </li>
                       <li>
-                        Se coordinará por el sistema el lugar y la fecha para
-                        realizar el pago.
+                        A través del sistema se coordinarán lugar, fecha y hora
+                        para entregar el dinero.
                       </li>
                       <li>
-                        Una vez entregado el efectivo, el propietario confirmará
-                        el pago en la plataforma.
+                        Una vez realizado el pago, el propietario confirmará la
+                        operación en la plataforma.
                       </li>
                     </ul>
                   </div>
@@ -544,28 +544,26 @@ function ClientePanel() {
                   </div>
                 )}
 
-                {/* YAPE: simulación QR y número */}
+                {/* YAPE: simulación QR */}
                 {isMetodoYape && (
                   <div className="mb-3 p-3 border rounded-3 bg-light text-center">
                     <p className="fw-semibold mb-2">
                       Paga con Yape escaneando este código
                     </p>
-                    <div
+                    <img
+                      src="https://via.placeholder.com/160x160.png?text=QR+Yape"
+                      alt="Código QR Yape"
                       style={{
                         width: "160px",
                         height: "160px",
-                        margin: "0 auto 10px",
-                        background:
-                          "repeating-linear-gradient(45deg,#ccc,#ccc 5px,#eee 5px,#eee 10px)",
+                        marginBottom: "10px",
                         borderRadius: "12px",
+                        objectFit: "cover",
                       }}
                     />
-                    <p className="mb-1">
-                      <strong>Celular Yape:</strong> 999 999 999
-                    </p>
                     <p className="text-muted mb-0">
-                      Luego de pagar, sube tu voucher o envíalo al propietario
-                      para que lo confirme.
+                      Escanea el código con tu app Yape y luego envía el voucher
+                      al propietario para que confirme el pago.
                     </p>
                   </div>
                 )}
